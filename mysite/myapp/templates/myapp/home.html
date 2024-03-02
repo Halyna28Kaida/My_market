@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <a href="{% url 'logout' %}">Logout</a>
+</div>
+
+<div>
+
+</div>
+
+<div class="flex">
+    {% for obj in object_list %}
+    <a href="{% url 'detail' obj.id %}">
+        <div class="w-72 h-96 m-8 p-8 border-2 rounded-s-lg">
+        <div>{{ obj.name }}</div>
+        <br>
+        <div>{{ obj.author.username }}</div>
+        <br>
+        <div>
+            {% if obj.image %}
+            <img class="w-14 h-20"  src="{{obj.image.url}}" alt="img">
+            {% endif %}
+        </div>
+        <br>
+        <div>Price: {{ obj.price }} $</div>
+        <br>
+        <div>Description: {{ obj.description }}</div>
+        <br>
+        <div>Quantity: {{ obj.quantity }}</div>
+    </div>
+    </a>
+
+    {% endfor %}
+</div>
+<br>
+<br>
+<div>
+    <a href="{% url 'product-create' %}">
+        <span class="border-black border-2 p-2">Create new product</span>
+    </a>
+</div>
+
+
+{% endblock %}

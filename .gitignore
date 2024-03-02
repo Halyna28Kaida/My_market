@@ -1,0 +1,5 @@
+.idea/
+market_venv/
+__pycache__
+db.sqlite3
+node_modules
