@@ -2,23 +2,52 @@
 
 {% block content %}
 
-<div class="flex p-10 w-full h-200 m-5">
-    <h1>I will buy these products: </h1>
-    {% for obj in object_list %}
-    <div class="w-2/3 p-5">
-        {{ obj.buyer }} <br>
-        {{ obj.product }}  <br>
-        Quantity:{{ obj.quantity_of_product }} <br>
-        <br>
-        <a href="">
-            <input class="bg-yellow-500 border-black border-2 rounded-lg p-2" type="submit" value="Buy">
-        </a>
-        <a href="">
-            <input class="bg-yellow-500 border-black border-2 rounded-lg p-2" type="submit" value="Return">
-        </a>
+<div class="flex justify-between">
+   <div>
+        <a href="{% url 'logout' %}">Logout</a>
     </div>
-    {% endfor %}
+    <div>
+        <a href="{% url 'my_purchases' %}">My purchases</a>
+    </div>
+
+    {% if user.is_superuser %}
+        <div>
+            <a href="{% url 'purchases' %}">Purchases</a>
+        </div>
+    {% endif %}
 </div>
 
+<div class="p-10 w-full h-200 m-5">
+    <h1>My purchases: </h1>
+    {% for obj in purchase %}
+        <div class="flex w-2/3 p-5">
+            {{ obj.created_at }} <br>
+            {{ obj.buyer}} <br>
+            {{ obj.product }}  <br>
+            Quantity: {{ obj.quantity_of_product }} <br>
+            Amount: {{ obj.total_amount }}
+        </div>
 
+    {% if enough_money %}
+        <a href="{% url 'purchases' %}">
+            <input type="submit" value="Buy">
+        </a>
+    {% else %}
+        <p>You don't have enough money to make purchases.</p>
+    {% endif %}
+
+    {% if allowed_return %}
+        <form method="post" action="{% url 'return_create' pk=obj.pk %}">
+            {% csrf_token %}
+            {{ form }}
+            <a href="">
+               <input  type="submit" value="Return">
+            </a>
+        </form>
+    {% else %}
+        <p>You cannot return</p>
+    {% endif %}
+    {% endfor %}
+</div>
 {% endblock %}
+

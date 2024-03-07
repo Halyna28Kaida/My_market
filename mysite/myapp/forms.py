@@ -32,3 +32,4 @@ class ReturnForm(ModelForm):
     class Meta:
         model = Return
         fields = ['text', 'purchase_for_returning']
+

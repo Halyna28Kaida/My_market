@@ -5,6 +5,13 @@
         <a href="{% url 'logout' %}">Logout</a>
     </div>
 
+
+    {% if user.is_superuser %}
+    <div>
+        <a href="{% url 'purchases' %}">Purchases</a>
+    </div>
+    {% endif %}
+
     <div class="w-1/3 h-auto border-2 border-black m-8 p-8 text-right">
         <form method="post" action="{% url 'product-create' %}">
             {% csrf_token %}

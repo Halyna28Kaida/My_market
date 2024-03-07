@@ -2,6 +2,19 @@
 
 {% block content %}
 
+<div class="flex justify-between">
+   <div>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    {% if user.is_superuser %}
+        <div>
+            <a href="{% url 'purchases' %}">Purchases</a>
+        </div>
+    {% endif %}
+
+</div>
+
 <div class="flex p-10 w-full h-200 m-5">
     <img class="w-28 h-36" src="{{ obj.image.url }}" alt="image">
     <div class="w-2/3 p-5">
@@ -12,8 +25,10 @@
         Quantity: {{ obj.quantity }}  <br>
         <br>
 
+        {% if user.is_superuser %}
+            <button>Update</button>
+        {% endif %}
 
-        <a class="bg-yellow-500 border-black border-2 rounded-lg p-2" href="{% url 'product-update' obj.pk %}">Update</a>
         <br>
         <br>
         <br>
@@ -21,10 +36,9 @@
 
         <form method="post" action="{% url 'add' obj.pk %}">
             {% csrf_token %}
-<!--            {{ create_form.product }}-->
             {{ create_form.quantity_of_product }}
-            <a href="">
-                <input class="bg-yellow-500 border-black border-2 rounded-lg p-2" type="submit" value="Add">
+            <a href="url 'profile' ">
+                <input class="bg-green-500 border-black border-2 rounded-lg p-2" type="submit" value="Add">
             </a>
 
         </form>

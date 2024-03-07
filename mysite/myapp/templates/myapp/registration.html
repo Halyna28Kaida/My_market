@@ -9,8 +9,11 @@
 
 <form method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Register">
+    {{ form.email }}<br><br>
+    {{ form.username }}<br><br>
+    {{ form.password1 }}<br><br>
+    {{ form.password2 }}<br><br>
+    <input class="border-2 bg-blue-500 px-2" type="submit" value="Register">
 </form>
 
 {% endblock %}

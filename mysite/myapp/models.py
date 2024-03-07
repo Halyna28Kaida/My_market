@@ -23,7 +23,7 @@ class Product(models.Model):
 class Purchase(models.Model):
     buyer = models.ForeignKey(MyUser, blank=True, null=True, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, blank=True, null=True, on_delete=models.CASCADE)
-    quantity_of_product = models.PositiveIntegerField(blank=True, null=True)
+    quantity_of_product = models.PositiveIntegerField(blank=True)
     created_at = models.DateTimeField(default=timezone.now)
 
 

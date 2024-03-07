@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from myapp.views import (Login, Logout, Register, ProductListView, ProductCreateView, ProductDetailView,
-                         ProductUpdateView, PurchaseListView, PurchaseCreateView)
+                         ProductUpdateView, PurchaseListView, PurchaseCreateView, ReturnCreateView, PurchaseListAdminView)
 # from django.contrib.auth.views import LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
@@ -16,7 +16,11 @@ urlpatterns = [
     path('update/<int:pk>/', ProductUpdateView.as_view(), name='product-update'),
     path('<int:pk>/', ProductDetailView.as_view(), name='detail'),
     path('add/<int:pk>/', PurchaseCreateView.as_view(), name='add'),
-    path('my_profile/', PurchaseListView.as_view(), name='profile'),
+    path('add/<int:pk>/my_profile/', PurchaseListView.as_view(), name='profile'),
+    path('my_purchases/', PurchaseListView.as_view(), name='my_purchases'),
+    path('add/purchases/', PurchaseListAdminView.as_view(), name='purchases'),
+    path('return/<int:pk>/', ReturnCreateView.as_view(), name='return_create'),
+
 
 ]
 
