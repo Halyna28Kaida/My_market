@@ -3,17 +3,23 @@
 {% block content %}
 
 <div class="flex justify-between">
-   <div>
+    <div>
         <a href="{% url 'logout' %}">Logout</a>
+    </div>
+    <div>
+        <a href="{% url 'home' %}">Home</a>
     </div>
     <div>
         <a href="{% url 'my_purchases' %}">My purchases</a>
     </div>
 
     {% if user.is_superuser %}
-        <div>
-            <a href="{% url 'purchases' %}">Purchases</a>
-        </div>
+    <div>
+        <a href="{% url 'purchases' %}">Purchases</a>
+    </div>
+    <div>
+        <a href="{% url 'return' %}">Return</a>
+    </div>
     {% endif %}
 </div>
 
@@ -29,24 +35,15 @@
         </div>
 
     {% if enough_money %}
-        <a href="{% url 'purchases' %}">
+        <form method="post" action="{% url 'buy' %}">
+            {% csrf_token %}
             <input type="submit" value="Buy">
-        </a>
+        </form>
     {% else %}
         <p>You don't have enough money to make purchases.</p>
     {% endif %}
 
-    {% if allowed_return %}
-        <form method="post" action="{% url 'return_create' pk=obj.pk %}">
-            {% csrf_token %}
-            {{ form }}
-            <a href="">
-               <input  type="submit" value="Return">
-            </a>
-        </form>
-    {% else %}
-        <p>You cannot return</p>
-    {% endif %}
+
     {% endfor %}
 </div>
 {% endblock %}

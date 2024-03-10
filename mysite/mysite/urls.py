@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.urls import path
 from myapp.views import (Login, Logout, Register, ProductListView, ProductCreateView, ProductDetailView,
-                         ProductUpdateView, PurchaseListView, PurchaseCreateView, ReturnCreateView, PurchaseListAdminView)
+                         ProductUpdateView, PurchaseListView, PurchaseCreateView, ReturnCreateView,
+                         PurchaseListAdminView, MyPurchaseListView, BuyView)
 # from django.contrib.auth.views import LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
@@ -16,12 +17,11 @@ urlpatterns = [
     path('update/<int:pk>/', ProductUpdateView.as_view(), name='product-update'),
     path('<int:pk>/', ProductDetailView.as_view(), name='detail'),
     path('add/<int:pk>/', PurchaseCreateView.as_view(), name='add'),
-    path('add/<int:pk>/my_profile/', PurchaseListView.as_view(), name='profile'),
-    path('my_purchases/', PurchaseListView.as_view(), name='my_purchases'),
+    path('profile/<int:pk>/', PurchaseListView.as_view(), name='profile'),
+    path('my_purchases/', MyPurchaseListView.as_view(), name='my_purchases'),
     path('add/purchases/', PurchaseListAdminView.as_view(), name='purchases'),
-    path('return/<int:pk>/', ReturnCreateView.as_view(), name='return_create'),
-
-
+    path('return/', ReturnCreateView.as_view(), name='return'),
+    path('buy/', BuyView.as_view(), name='buy'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,16 +3,24 @@
 {% block content %}
 
 <div class="flex justify-between">
-   <div>
+    <div>
         <a href="{% url 'logout' %}">Logout</a>
+    </div>
+    <div>
+        <a href="{% url 'home' %}">Home</a>
+    </div>
+    <div>
+        <a href="{% url 'my_purchases' %}">My purchases</a>
     </div>
 
     {% if user.is_superuser %}
-        <div>
-            <a href="{% url 'purchases' %}">Purchases</a>
-        </div>
+    <div>
+        <a href="{% url 'purchases' %}">Purchases</a>
+    </div>
+    <div>
+        <a href="{% url 'return' %}">Return</a>
+    </div>
     {% endif %}
-
 </div>
 
 <div class="flex p-10 w-full h-200 m-5">
@@ -37,11 +45,13 @@
         <form method="post" action="{% url 'add' obj.pk %}">
             {% csrf_token %}
             {{ create_form.quantity_of_product }}
-            <a href="url 'profile' ">
+            <a href="{% url 'profile' obj.pk %}">
                 <input class="bg-green-500 border-black border-2 rounded-lg p-2" type="submit" value="Add">
             </a>
 
         </form>
+
+
 
     </div>
 

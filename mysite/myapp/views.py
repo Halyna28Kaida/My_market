@@ -1,14 +1,18 @@
+import datetime
 from datetime import timedelta
 
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from .models import MyUser, Purchase, Product, Return
 from .forms import PurchaseCreateForm, ProductCreateForm, NewUserForm, ReturnForm
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from .mixins.myapp.mixins import SuperuserRequiredMixin
+from django.http import HttpResponseRedirect
 
 
 class ProductListView(LoginRequiredMixin, ListView):
@@ -72,7 +76,7 @@ class PurchaseCreateView(CreateView):
     login_url = 'login/'
     http_method_names = ['get', 'post']
     form_class = PurchaseCreateForm
-    success_url = 'my_profile/'
+    success_url = reverse_lazy('profile')
 
     def form_valid(self, form):
         obj = form.save(commit=False)
@@ -80,8 +84,15 @@ class PurchaseCreateView(CreateView):
         product_pk = self.kwargs['pk']
         product_instance = get_object_or_404(Product, pk=product_pk)
         obj.product = product_instance
+        if obj.quantity_of_product is not None:
+            obj.total_amount = obj.quantity_of_product * obj.product.price
+        else:
+            obj.total_amount = 0
         obj.save()
-        return super().form_valid(form=form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse_lazy('profile', kwargs={'pk': self.kwargs['pk']})
 
 
 class PurchaseListView(LoginRequiredMixin, ListView):
@@ -89,29 +100,60 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'profile.html'
     context_object_name = 'purchase'
     login_url = 'login/'
-    extra_context = {'create_form': ReturnForm}
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Purchase.objects.filter(buyer=user)
+        queryset = Purchase.objects.filter(buyer=user, is_purchased=False)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        product_pk = self.kwargs.get('pk')
-        product = get_object_or_404(Product, pk=product_pk)
-        context['product'] = product
-        price = product.price
-        context['price'] = price
+
         user = self.request.user
         purse = user.purse
-        for obj in context['purchase']:
-            if obj.quantity_of_product is not None:
-                obj.total_amount = obj.quantity_of_product * price
-            else:
-                obj.total_amount = 0
-            context['enough_money'] = purse >= obj.total_amount
+        purchase = self.get_queryset()
+
+        enough_money = True
+
+        for obj in purchase:
+            if purse < obj.total_amount:
+                enough_money = False
+                break
+
+        context['enough_money'] = enough_money
+        if enough_money:
+            total_amount = sum(obj.total_amount for obj in purchase)
+            purse -= total_amount
+            user.purse = purse
+
+            user.save()
+            for obj in purchase:
+                product = obj.product
+                product.quantity -= obj.quantity_of_product
+                product.save()
         return context
+
+
+class BuyView(View):
+
+    def post(self, request):
+        user = request.user
+        purchases_to_buy = Purchase.objects.filter(buyer=user, is_purchased=False)
+        purchases_to_buy.update(is_purchased=True)
+        return redirect('my_purchases')
+
+
+class MyPurchaseListView(LoginRequiredMixin, ListView):
+    model = Purchase
+    template_name = 'my_purchases.html'
+    context_object_name = 'my_purchases'
+    login_url = 'login/'
+    extra_context = {'create_form': ReturnForm}
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Purchase.objects.filter(buyer=user, is_purchased=True)
+        return queryset
 
 
 class PurchaseListAdminView(SuperuserRequiredMixin, ListView):
@@ -120,29 +162,24 @@ class PurchaseListAdminView(SuperuserRequiredMixin, ListView):
     context_object_name = 'purchases'
     login_url = 'login/'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        purchases = context['purchases']
-        for purchase in purchases:
-            # Рассчитываем общую сумму каждой покупки
-            total_amount = purchase.quantity_of_product * purchase.product.price
-            purchase.total_amount = total_amount
-        return context
+    def get_queryset(self):
+        queryset = Purchase.objects.filter(is_purchased=True)
+        return queryset
 
 
 class ReturnCreateView(LoginRequiredMixin, CreateView):
-    template_name = 'profile.html'
+    template_name = 'my_purchases.html'
     login_url = 'login/'
     http_method_names = ['get', 'post']
     form_class = ReturnForm
     model = Return
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('home')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        purchase_pk = self.kwargs.get('pk')
-        purchase = get_object_or_404(Purchase, pk=purchase_pk)
-        allowed_return_window = purchase.created_at + timedelta(seconds=3)
+        purchase_for_returning = self.kwargs['purchase_for_returning']
+        purchase = get_object_or_404(Return, pk=purchase_for_returning)
+        allowed_return_window = purchase.created_at + timedelta(minutes=3)
         allowed_return = timezone.now() < allowed_return_window
         context['allowed_return'] = allowed_return
         return context

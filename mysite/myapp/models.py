@@ -24,7 +24,9 @@ class Purchase(models.Model):
     buyer = models.ForeignKey(MyUser, blank=True, null=True, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, blank=True, null=True, on_delete=models.CASCADE)
     quantity_of_product = models.PositiveIntegerField(blank=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(default=timezone.now)
+    is_purchased = models.BooleanField(default=False)
 
 
 class Return(models.Model):

@@ -18,14 +18,14 @@
         <a href="{% url 'purchases' %}">Purchases</a>
     </div>
     <div>
-        <a href="{% url 'return' purchase.pk %}">Return</a>
+        <a href="{% url 'return'%}">Return</a>
     </div>
     {% endif %}
 </div>
 
 <div class="p-10 w-full h-200 m-5">
-    <h1>Purchases: </h1>
-    {% for obj in purchases %}
+    <h1>My purchases: </h1>
+    {% for obj in my_purchases %}
         <div class="flex w-2/3 p-5">
             {{ obj.created_at }} <br>
             {{ obj.buyer}} <br>
@@ -33,6 +33,21 @@
             Quantity: {{ obj.quantity_of_product }} <br>
             Amount: {{ obj.total_amount }}
         </div>
+        {% if allowed_return %}
+        <form method="post" action="{% url 'return' %}">
+            {% csrf_token %}
+            {{ create_form }}
+            <a href="{% url 'return' purchase.pk %}">
+              <input  type="submit" value="Return">
+            </a>
+
+        {% else %}
+            <p>You cannot return</p>
+        {% endif %}
+
+
     {% endfor %}
 </div>
 {% endblock %}
+
+

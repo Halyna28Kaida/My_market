@@ -3,17 +3,26 @@
 {% block content %}
 
 
-<div>
-    <a href="{% url 'logout' %}">Logout</a>
-</div>
+<div class="flex justify-between">
+    <div>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+    <div>
+        <a href="{% url 'home' %}">Home</a>
+    </div>
+    <div>
+        <a href="{% url 'my_purchases' %}">My purchases</a>
+    </div>
 
-
-
-{% if user.is_superuser %}
+    {% if user.is_superuser %}
     <div>
         <a href="{% url 'purchases' %}">Purchases</a>
     </div>
-{% endif %}
+    <div>
+        <a href="{% url 'return' %}">Return</a>
+    </div>
+    {% endif %}
+</div>
 
 <div>
     <form method="post" action="{% url 'product-update' obj.pk %}">

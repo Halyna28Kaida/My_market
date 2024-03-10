@@ -6,6 +6,9 @@
         <a href="{% url 'logout' %}">Logout</a>
     </div>
     <div>
+        <a href="{% url 'home' %}">Home</a>
+    </div>
+    <div>
         <a href="{% url 'my_purchases' %}">My purchases</a>
     </div>
 
@@ -13,10 +16,13 @@
     <div>
         <a href="{% url 'purchases' %}">Purchases</a>
     </div>
+    <div>
+        <a href="{% url 'return' %}">Return</a>
+    </div>
     {% endif %}
 </div>
 
-<div class="flex">
+<div class="flex flex-wrap">
     {% for obj in object_list %}
     <a href="{% url 'detail' obj.id %}">
         <div class="w-72 h-96 m-8 p-8 border-2 rounded-s-lg">
